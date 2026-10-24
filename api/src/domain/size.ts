@@ -1,4 +1,6 @@
-export type Size = 'S' | 'M' | 'L';
+export const SIZES = ['S' , 'M' , 'L'] as const;
+
+export type Size = (typeof SIZES)[number]
 
 export const SIZE_ORDER: Record<Size, number> = {S: 1, M: 2, L:3};
 

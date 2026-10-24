@@ -1,4 +1,5 @@
 import { fits, type Size } from './size.js';
+import { DomainError } from './errors.js';
 
 export type CompartmentStatus = 'free' | 'occupied' | 'out_of_service';
 
@@ -14,41 +15,25 @@ export interface ParcelToPlace {
   size: Size;
 }
 
-export type PlacementErrorCode =
-| 'COMPARTMENT_OUT_OF_SERVICE'
-| 'COMPARTMENT_OCCUPIED'
-| 'PARCEL_TOO_LARGE'
-| 'PARCEL_NOT_IN_COMPARTMENT';
-
-export class PlacementError extends Error {
-    readonly code: PlacementErrorCode;
-
-    constructor(code: PlacementErrorCode) {
-        super(code);
-        this.name = 'PlacementError';
-        this.code = code;
-    }
-}
-
 export function placeParcel(compartment: Compartment, parcel: ParcelToPlace): Compartment{
     if(compartment.parcelId === parcel.id) {
         return compartment;
     }
     if (compartment.status === 'out_of_service'){
-        throw new PlacementError('COMPARTMENT_OUT_OF_SERVICE');    
+        throw new DomainError('COMPARTMENT_OUT_OF_SERVICE');    
     }
     if (compartment.status === 'occupied') {
-        throw new PlacementError('COMPARTMENT_OCCUPIED');
+        throw new DomainError('COMPARTMENT_OCCUPIED');
     }
     if (!fits(parcel.size, compartment.size)) {
-        throw new PlacementError('PARCEL_TOO_LARGE');
+        throw new DomainError('PARCEL_TOO_LARGE');
     }
     return { ...compartment, status: 'occupied', parcelId: parcel.id};
 }
 
 export function pickUpParcel(compartment: Compartment, parcelId: string): Compartment {
     if(compartment.parcelId !== parcelId) {
-        throw new PlacementError('PARCEL_NOT_IN_COMPARTMENT');
+        throw new DomainError('PARCEL_NOT_IN_COMPARTMENT');
     }
     const status = compartment.status === 'out_of_service' ? 'out_of_service' : 'free';
     return { ...compartment, status, parcelId: null};
