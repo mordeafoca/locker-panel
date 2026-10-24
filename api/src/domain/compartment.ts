@@ -17,7 +17,8 @@ export interface ParcelToPlace {
 export type PlacementErrorCode =
 | 'COMPARTMENT_OUT_OF_SERVICE'
 | 'COMPARTMENT_OCCUPIED'
-| 'PARCEL_TOO_LARGE';
+| 'PARCEL_TOO_LARGE'
+| 'PARCEL_NOT_IN_COMPARTMENT';
 
 export class PlacementError extends Error {
     readonly code: PlacementErrorCode;
@@ -43,4 +44,12 @@ export function placeParcel(compartment: Compartment, parcel: ParcelToPlace): Co
         throw new PlacementError('PARCEL_TOO_LARGE');
     }
     return { ...compartment, status: 'occupied', parcelId: parcel.id};
+}
+
+export function pickUpParcel(compartment: Compartment, parcelId: string): Compartment {
+    if(compartment.parcelId !== parcelId) {
+        throw new PlacementError('PARCEL_NOT_IN_COMPARTMENT');
+    }
+    const status = compartment.status === 'out_of_service' ? 'out_of_service' : 'free';
+    return { ...compartment, status, parcelId: null};
 }
