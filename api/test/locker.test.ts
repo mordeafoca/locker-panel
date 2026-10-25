@@ -1,9 +1,8 @@
 import request from 'supertest';
 import { describe, it, expect } from 'vitest';
-import { createApp } from '../src/app.js';
 import { CompartmentModel } from '../src/infra/compartment-model.js';
-import { MongoCompartmentRepository } from '../src/infra/mongo-compartment-repository.js';
 import { useTestDatabase } from './helpers/test-database.js';
+import { buildApp } from './helpers/build-app.js';
 
 useTestDatabase();
 
@@ -13,7 +12,7 @@ describe('GET /locker', () => {
             { _id: 'C02', size: 'M', status: 'occupied', parcelId: 'P1'},
             { _id: 'C01', size: 'S', status: 'free', parcelId: null },
         ]);
-        const app = createApp({ compartments: new MongoCompartmentRepository() });
+        const app = buildApp();
 
         const res = await request(app).get('/locker');
 

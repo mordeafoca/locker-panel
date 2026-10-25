@@ -4,7 +4,10 @@ import { createApp } from '../src/app.js';
 
 describe('GET /health', () => {
     it('200 status ok', async () => {
-        const app = createApp({ compartments: { findAll: async () => []} });
+        const app = createApp({ 
+            compartments: { findAll: async () => []},
+            parcels: { create: async() => {} }, 
+        });
         
         const res = await request(app).get('/health');
 
