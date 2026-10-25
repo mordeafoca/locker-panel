@@ -4,6 +4,7 @@ import type { ParcelRepository } from './domain/parcel-repository.js';
 import { errorHandler } from './http/error-handler.js';
 import { lockerRouter } from './http/locker-routes.js';
 import { parcelRouter } from './http/parcel-routes.js';
+import { LockerService } from './application/locker-service.js';
 
 export interface AppDependencies {
     compartments: CompartmentRepository;
@@ -12,6 +13,8 @@ export interface AppDependencies {
 
 export function createApp(deps: AppDependencies) {
     const app= express();
+    const locker = new LockerService(deps.compartments, deps.parcels);
+
     app.use(express.json());
 
     app.get('/health', (_req, res) => {
@@ -19,7 +22,7 @@ export function createApp(deps: AppDependencies) {
     });
 
     app.use(lockerRouter(deps.compartments));
-    app.use(parcelRouter(deps.parcels));
+    app.use(parcelRouter(deps.parcels, locker));
 
     app.use(errorHandler);
     

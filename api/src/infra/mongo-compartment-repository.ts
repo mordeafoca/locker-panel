@@ -11,4 +11,12 @@ export class MongoCompartmentRepository implements CompartmentRepository {
         const docs = await CompartmentModel.find().sort({ _id:1}).lean<CompartmentDoc[]>();
         return docs.map(toDomain);
     }
+
+    async occupy(compartmentId: string, parcelId: string): Promise<boolean>{
+        const result = await CompartmentModel.updateOne(
+            { _id: compartmentId, status: 'free'},
+            { $set: { status: 'occupied', parcelId} },
+        );
+        return result.modifiedCount === 1;
+    }
 }

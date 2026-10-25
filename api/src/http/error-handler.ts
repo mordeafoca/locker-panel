@@ -8,6 +8,11 @@ const STATUS_BY_CODE: Record<ErrorCode, number> = {
     PARCEL_TOO_LARGE: 422,
     PARCEL_NOT_IN_COMPARTMENT: 409,
     PARCEL_ALREADY_EXISTS: 409,
+    COMPARTMENT_NOT_FOUND: 404,
+    NO_COMPARTMENT_AVAILABLE: 409,
+    PARCEL_NOT_FOUND: 404,
+    PARCEL_ALREADY_PLACED: 409,
+    PARCEL_ALREADY_PICKED_UP: 409,
 };
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
