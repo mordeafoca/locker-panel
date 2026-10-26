@@ -1,15 +1,29 @@
 import { placeParcel, pickUpParcel } from "../domain/compartment.js";
 import type { CompartmentRepository } from "../domain/compartment-repository.js";
 import { DomainError } from "../domain/errors.js";
-import type { Parcel } from "../domain/parcel.js";
+import { newParcel, type NewParcelInput, type Parcel } from "../domain/parcel.js";
 import type { ParcelRepository } from "../domain/parcel-repository.js";
 import { suggestCompartment } from "../domain/suggest.js";
+import type { EventRepository } from "../domain/event-repository.js";
 
 export class LockerService {
     constructor(
         private readonly compartments: CompartmentRepository,
         private readonly parcels: ParcelRepository,
+        private readonly events: EventRepository,
     ) {}
+
+    async createParcel(input: NewParcelInput): Promise<Parcel> {
+        const parcel = newParcel(input);
+        await this.parcels.create(parcel);
+        await this.events.record({
+            type: 'parcel_created',
+            parcelId: parcel.id,
+            carrier: parcel.carrier,
+            compartmentId: null,
+        });
+        return parcel;
+    }
 
     async placeParcel(parcelId: string, compartmentId?: string): Promise<Parcel>{
         const parcel = await this.parcels.findById(parcelId);
@@ -45,6 +59,13 @@ export class LockerService {
         }
         await this.parcels.markPlaced(parcel.id, target.id);
 
+        await this.events.record({
+            type: 'parcel_placed',
+            parcelId: parcel.id,
+            carrier: parcel.carrier,
+            compartmentId: target.id,
+        });
+
         return { ...parcel, status: 'placed', compartmentId: target.id};
     }
 
@@ -74,6 +95,13 @@ export class LockerService {
             throw new DomainError('PARCEL_NOT_IN_COMPARTMENT');
         }
         await this.parcels.markPickedUp(parcel.id);
+
+        await this.events.record({
+            type: 'parcel_picked_up',
+            parcelId: parcel.id,
+            carrier: parcel.carrier,
+            compartmentId: compartment.id,
+        });
 
         return { ...parcel, status: 'picked_up'};
     }

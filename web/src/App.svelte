@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import * as api from './lib/api';
+  import ActivityLog from './lib/components/ActivityLog.svelte';
   import LockerFront from './lib/components/LockerFront.svelte';
   import NewParcelForm from './lib/components/NewParcelForm.svelte';
   import ParcelList from './lib/components/ParcelList.svelte';
@@ -8,12 +9,14 @@
   import { messageFor } from './lib/messages';
   import type { ScreenState } from './lib/screen';
   import { theme, toggleTheme } from './lib/theme.svelte';
-  import type { Carrier, Compartment, NewParcel, Parcel, ParcelStatus } from './lib/types';
+  import type { Carrier, Compartment, LockerEvent, NewParcel, Parcel, ParcelStatus } from './lib/types';
 
   const REFRESH_MS = 4000;
 
   let compartments = $state<Compartment[]>([]);
   let parcels = $state<Parcel[]>([]);
+  let events = $state<LockerEvent[]>([]);
+  let now = $state(Date.now());
   let online = $state<boolean | null>(null);
   let busy = $state(false);
   let error = $state<string | null>(null);
@@ -49,9 +52,15 @@
 
   async function refresh() {
     try {
-      const [nextCompartments, nextParcels] = await Promise.all([api.getLocker(), api.listParcels()]);
+      const [nextCompartments, nextParcels, nextEvents] = await Promise.all([
+        api.getLocker(),
+        api.listParcels(),
+        api.listEvents(),
+      ]);
       compartments = nextCompartments;
       parcels = nextParcels;
+      events = nextEvents;
+      now = Date.now();
       if (online === false) error = null;
       online = true;
     } catch (e) {
@@ -147,7 +156,8 @@
   </header>
 
   <main>
-    <LockerFront
+    <div class="front">
+      <LockerFront
       {compartments}
       {parcels}
       {placing}
@@ -155,7 +165,12 @@
       focusedParcelId={focusedId}
       {screen}
       ondoor={onDoor}
-    />
+      />
+    </div>
+
+    <div class="activity">
+      <ActivityLog {events} {now} />
+    </div>
 
     <aside>
       {#if error}
@@ -215,11 +230,26 @@
   main {
     display: grid;
     grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
-    gap: 4rem;
+    grid-template-areas:
+      'front aside'
+      'activity aside';
+    grid-template-rows: auto 1fr;
+    gap: 2.5rem 4rem;
     align-items: start;
   }
 
+  .front {
+    grid-area: front;
+    width: 100%;
+  }
+
+  .activity {
+    grid-area: activity;
+    width: 100%;
+  }
+
   aside {
+    grid-area: aside;
     width: 100%;
     display: grid;
     gap: 2.25rem;
@@ -245,6 +275,11 @@
   @media (max-width: 860px) {
     main {
       grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'front'
+        'aside'
+        'activity';
+      grid-template-rows: auto;
       justify-items: center;
       gap: 2.5rem;
     }

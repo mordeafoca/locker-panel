@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { CARRIERS, newParcel } from '../domain/parcel.js';
+import { CARRIERS } from '../domain/parcel.js';
 import type { ParcelRepository } from '../domain/parcel-repository.js';
 import { SIZES } from '../domain/size.js';
 import type { LockerService } from '../application/locker-service.js';
@@ -26,8 +26,7 @@ export function parcelRouter(parcels: ParcelRepository, locker: LockerService): 
 
     router.post('/parcels', async (req, res) => {
         const input = createParcelSchema.parse(req.body);
-        const parcel = newParcel(input);
-        await parcels.create(parcel);
+        const parcel = await locker.createParcel(input);
         res.status(201).json(parcel);
     });
 

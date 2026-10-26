@@ -5,6 +5,7 @@ import { MongoCompartmentRepository } from "./infra/mongo-compartment-repository
 import { MongoParcelRepository } from "./infra/mongo-parcel-repository.js";
 import { seedCompartments } from "./infra/seed.js";
 import { logger } from "./logger.js";
+import { MongoEventRepository } from "./infra/mongo-event-repository.js";
 
 await mongoose.connect(config.mongoUrl);
 await seedCompartments();
@@ -12,6 +13,7 @@ await seedCompartments();
 const app = createApp({ 
     compartments: new MongoCompartmentRepository(),
     parcels: new MongoParcelRepository(),
+    events: new MongoEventRepository(),
 });
 
 

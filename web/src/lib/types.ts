@@ -35,3 +35,14 @@ export interface ParcelFilter {
   carrier?: Carrier;
   status?: ParcelStatus;
 }
+
+export type EventType = 'parcel_created' | 'parcel_placed' | 'parcel_picked_up';
+
+export interface LockerEvent {
+  id: string;
+  type: EventType;
+  parcelId: string;
+  carrier: Carrier;
+  compartmentId: string | null;
+  at: string;
+}
