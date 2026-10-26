@@ -1,6 +1,6 @@
 import { DomainError } from '../domain/errors.js';
 import type { Parcel } from '../domain/parcel.js';
-import type { ParcelRepository } from '../domain/parcel-repository.js';
+import type { ParcelRepository, ParcelFilter } from '../domain/parcel-repository.js';
 import { ParcelModel, type ParcelDoc } from './parcel-model.js';
 
 const DUPLICATE_KEY = 11000;
@@ -37,6 +37,18 @@ export class MongoParcelRepository implements ParcelRepository {
             { _id: parcelId }, 
             { $set: { status: 'placed', compartmentId}}
         );
+    }
+
+    async markPickedUp(parcelId: string): Promise<void> {
+        await ParcelModel.updateOne(
+            { _id: parcelId}, 
+            { $set: { status: 'picked_up'}}
+        );
+    }
+
+    async findAll(filter: ParcelFilter): Promise<Parcel[]> {
+        const docs = await ParcelModel.find(filter).sort({ _id: 1}).lean<ParcelDoc[]>();
+        return docs.map(toDomain);
     }
 
 }

@@ -1,4 +1,4 @@
-import { placeParcel } from "../domain/compartment.js";
+import { placeParcel, pickUpParcel } from "../domain/compartment.js";
 import type { CompartmentRepository } from "../domain/compartment-repository.js";
 import { DomainError } from "../domain/errors.js";
 import type { Parcel } from "../domain/parcel.js";
@@ -46,5 +46,35 @@ export class LockerService {
         await this.parcels.markPlaced(parcel.id, target.id);
 
         return { ...parcel, status: 'placed', compartmentId: target.id};
+    }
+
+
+    async pickUpParcel(parcelId: string): Promise<Parcel> {
+        const parcel = await this.parcels.findById(parcelId);
+        if(!parcel){
+            throw new DomainError('PARCEL_NOT_FOUND');
+        }
+        if(parcel.status === 'picked_up'){
+            return parcel;
+        }
+        if(parcel.status !== 'placed' || parcel.compartmentId === null) {
+            throw new DomainError('PARCEL_NOT_PLACED');
+        }
+
+        const all = await this.compartments.findAll();
+        const compartment = all.find((c) => c.id === parcel.compartmentId);
+        if(!compartment) {
+            throw new DomainError('COMPARTMENT_NOT_FOUND');
+        }
+
+        const released = pickUpParcel(compartment, parcel.id);
+
+        const ok = await this.compartments.release(compartment.id, parcel.id, released.status);
+        if(!ok){
+            throw new DomainError('PARCEL_NOT_IN_COMPARTMENT');
+        }
+        await this.parcels.markPickedUp(parcel.id);
+
+        return { ...parcel, status: 'picked_up'};
     }
 }

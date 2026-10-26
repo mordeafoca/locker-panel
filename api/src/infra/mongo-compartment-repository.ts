@@ -1,4 +1,4 @@
-import type { Compartment } from '../domain/compartment.js';
+import type { Compartment, CompartmentStatus } from '../domain/compartment.js';
 import type { CompartmentRepository } from '../domain/compartment-repository.js';
 import { CompartmentModel, type CompartmentDoc } from './compartment-model.js';
 
@@ -17,6 +17,14 @@ export class MongoCompartmentRepository implements CompartmentRepository {
             { _id: compartmentId, status: 'free'},
             { $set: { status: 'occupied', parcelId} },
         );
+        return result.modifiedCount === 1;
+    }
+
+    async release(compartmentId: string, parcelId: string, status: CompartmentStatus): Promise<boolean>{
+        const result = await CompartmentModel.updateOne(
+            { _id: compartmentId, parcelId},
+            { $set: {status, parcelId: null}},
+        )
         return result.modifiedCount === 1;
     }
 }

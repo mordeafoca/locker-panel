@@ -4,6 +4,7 @@ import { CARRIERS, newParcel } from '../domain/parcel.js';
 import type { ParcelRepository } from '../domain/parcel-repository.js';
 import { SIZES } from '../domain/size.js';
 import type { LockerService } from '../application/locker-service.js';
+import { PARCEL_STATUSES } from '../domain/parcel.js';
 
 const createParcelSchema = z.object({
     id: z.string().trim().min(1).max(64),
@@ -13,6 +14,11 @@ const createParcelSchema = z.object({
 
 const placeParcelSchema = z.object({
     compartmentId: z.string().min(1).optional(),
+});
+
+const listParcelsSchema = z.object({
+    carrier: z.enum(CARRIERS).optional(),
+    status: z.enum(PARCEL_STATUSES).optional(),
 });
 
 export function parcelRouter(parcels: ParcelRepository, locker: LockerService): Router {
@@ -28,6 +34,16 @@ export function parcelRouter(parcels: ParcelRepository, locker: LockerService): 
     router.post('/parcels/:id/place', async (req, res) => {
         const { compartmentId } = placeParcelSchema.parse(req.body ?? {});
         const parcel = await locker.placeParcel(req.params.id, compartmentId);
+        res.json(parcel);
+    });
+
+    router.get('/parcels', async (req,res) => {
+        const filter = listParcelsSchema.parse(req.query);
+        res.json({ parcels: await parcels.findAll(filter)});
+    });
+
+    router.post('/parcels/:id/pick-up', async (req, res) => {
+        const parcel = await locker.pickUpParcel(req.params.id);
         res.json(parcel);
     });
 

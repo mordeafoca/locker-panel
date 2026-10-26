@@ -8,7 +8,8 @@ export type ErrorCode =
 | 'NO_COMPARTMENT_AVAILABLE'
 | 'PARCEL_NOT_FOUND'
 | 'PARCEL_ALREADY_PLACED'
-| 'PARCEL_ALREADY_PICKED_UP';
+| 'PARCEL_ALREADY_PICKED_UP'
+| 'PARCEL_NOT_PLACED';
 
 export class DomainError extends Error {
     readonly code: ErrorCode;

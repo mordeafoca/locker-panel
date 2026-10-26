@@ -4,7 +4,8 @@ export const CARRIERS = ['andorinha', 'rapidex', 'norte-express'] as const;
 
 export type Carrier = (typeof CARRIERS)[number];
 
-export type ParcelStatus = 'created' | 'placed' | 'picked_up';
+export const PARCEL_STATUSES = ['created', 'placed', 'picked_up'] as const;
+export type ParcelStatus = (typeof PARCEL_STATUSES)[number];
 
 export interface Parcel {
     id: string;

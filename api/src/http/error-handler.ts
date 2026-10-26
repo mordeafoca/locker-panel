@@ -13,6 +13,7 @@ const STATUS_BY_CODE: Record<ErrorCode, number> = {
     PARCEL_NOT_FOUND: 404,
     PARCEL_ALREADY_PLACED: 409,
     PARCEL_ALREADY_PICKED_UP: 409,
+    PARCEL_NOT_PLACED: 409,
 };
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
