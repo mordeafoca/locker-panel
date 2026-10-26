@@ -1,0 +1,124 @@
+/* Two finishes of the same hardware: a graphite cabinet for dark mode,
+   a sand cabinet for light mode. Everything else is quiet. */
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --room: #ece6dc;
+  --body: #e2d2b2;
+  --body-shade: #d3c09c;
+  --door: #eee2c9;
+  --door-shade: #e5d6b7;
+  --seam: #bfa77e;
+  --ink: #29241d;
+  --ink-muted: #6e6455;
+  --line: #cdbfa5;
+  --led: #fffaf0;
+  --led-glow: rgba(255, 236, 205, 0.9);
+  --accent: #d9582a;
+  --screen: linear-gradient(165deg, #fdf6ef 0%, #f8e2cf 42%, #f0a273 80%, #df6233 100%);
+  --screen-ink: #3b2216;
+  --label: #fffdf7;
+  --label-ink: #29241d;
+  --hatch: rgba(80, 60, 30, 0.14);
+  --shadow: rgba(90, 70, 40, 0.35);
+  --andorinha: #2f5f9e;
+  --rapidex: #b0731a;
+  --norte-express: #2e7752;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --room: #1e1e20;
+  --body: #2b2b2f;
+  --body-shade: #232326;
+  --door: #37373c;
+  --door-shade: #2f2f33;
+  --seam: #18181a;
+  --ink: #ececee;
+  --ink-muted: #9d9da5;
+  --line: #3c3c42;
+  --led: #f2f7fb;
+  --led-glow: rgba(214, 232, 245, 0.55);
+  --accent: #ff7b3f;
+  --screen: linear-gradient(165deg, #1c1a20 0%, #35191c 40%, #c2402a 80%, #f39150 100%);
+  --screen-ink: #fff4ec;
+  --label: #e8e2d6;
+  --label-ink: #1f1d1a;
+  --hatch: rgba(255, 255, 255, 0.07);
+  --shadow: rgba(0, 0, 0, 0.7);
+  --andorinha: #7ea6dd;
+  --rapidex: #e3b457;
+  --norte-express: #74c497;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--room);
+  color: var(--ink);
+  font-family: 'Archivo Variable', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.expanded {
+  font-stretch: 125%;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: transparent;
+  padding: 0.4rem 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--ink-muted);
+}
+
+.btn.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--room);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
