@@ -16,7 +16,7 @@ const STATUS_BY_CODE: Record<ErrorCode, number> = {
     PARCEL_NOT_PLACED: 409,
 };
 
-export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     if(err instanceof ZodError) {
         res.status(400).json({ error: 'VALIDATION_ERROR', details: err.issues });
         return;
@@ -29,6 +29,6 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
         res.status(STATUS_BY_CODE[err.code]).json({ error: err.code });
         return;
     }
-    console.error(err);
+    req.log.error({ err }, 'unexpected error');
     res.status(500).json({ error: 'INTERNAL_ERROR' });
 };

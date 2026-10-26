@@ -4,6 +4,7 @@ import { config } from './config.js';
 import { MongoCompartmentRepository } from "./infra/mongo-compartment-repository.js";
 import { MongoParcelRepository } from "./infra/mongo-parcel-repository.js";
 import { seedCompartments } from "./infra/seed.js";
+import { logger } from "./logger.js";
 
 await mongoose.connect(config.mongoUrl);
 await seedCompartments();
@@ -15,5 +16,5 @@ const app = createApp({
 
 
 app.listen(config.port, () => {
-    console.log(`API em http://localhost:${config.port}`);
+      logger.info({ port: config.port }, 'api listening');
 });
