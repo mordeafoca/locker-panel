@@ -1,4 +1,4 @@
-import type { Compartment, NewParcel, Parcel, ParcelFilter, LockerEvent } from './types';
+import type { Compartment, NewParcel, Parcel, ParcelFilter, LockerEvent, Carrier } from './types';
 
 export class ApiError extends Error {
   constructor(
@@ -54,4 +54,8 @@ export function pickUpParcel(parcelId: string): Promise<Parcel> {
 export async function listEvents(limit = 8): Promise<LockerEvent[]> {
   const body = await request<{ events: LockerEvent[] }>(`/events?limit=${limit}`);
   return body.events;
+}
+
+export function deliverFromCarrier(carrier: Carrier, payload: unknown): Promise<Parcel> {
+  return request<Parcel>(`/carriers/${carrier}/parcels`, { method: 'POST', body: JSON.stringify(payload) });
 }

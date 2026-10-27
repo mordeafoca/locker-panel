@@ -88,7 +88,7 @@
   }
 
   .id {
-    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+    font-size: clamp(0.85rem, 1.25vw, 1rem);
     font-weight: 700;
     line-height: 1.2;
     white-space: nowrap;

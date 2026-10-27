@@ -9,7 +9,8 @@ export type ErrorCode =
 | 'PARCEL_NOT_FOUND'
 | 'PARCEL_ALREADY_PLACED'
 | 'PARCEL_ALREADY_PICKED_UP'
-| 'PARCEL_NOT_PLACED';
+| 'PARCEL_NOT_PLACED'
+| 'CARRIER_NOT_FOUND';
 
 export class DomainError extends Error {
     readonly code: ErrorCode;

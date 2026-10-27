@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import * as api from './lib/api';
+  import { samplePayload } from './lib/carrier-samples';
   import ActivityLog from './lib/components/ActivityLog.svelte';
+  import CarrierDelivery from './lib/components/CarrierDelivery.svelte';
   import LockerFront from './lib/components/LockerFront.svelte';
   import NewParcelForm from './lib/components/NewParcelForm.svelte';
   import ParcelList from './lib/components/ParcelList.svelte';
@@ -26,6 +28,7 @@
   let placingId = $state<string | null>(null);
   let focusedId = $state<string | null>(null);
   let lastEvent = $state<ScreenState | null>(null);
+  let lastDelivery = $state<{ carrier: Carrier; payload: unknown } | null>(null);
 
   const placing = $derived(parcels.find((p) => p.id === placingId && p.status === 'created') ?? null);
 
@@ -90,6 +93,17 @@
       await api.createParcel(input);
       tab = 'created';
       placingId = input.id;
+      focusedId = null;
+    });
+  }
+
+  function deliver(carrier: Carrier) {
+    const payload = samplePayload(carrier);
+    lastDelivery = { carrier, payload };
+    run(async () => {
+      const parcel = await api.deliverFromCarrier(carrier, payload);
+      tab = 'created';
+      placingId = parcel.id;
       focusedId = null;
     });
   }
@@ -181,6 +195,8 @@
       {/if}
 
       <NewParcelForm {busy} oncreate={create} />
+
+      <CarrierDelivery {busy} last={lastDelivery} ondeliver={deliver} />
 
       <ParcelList
         {parcels}

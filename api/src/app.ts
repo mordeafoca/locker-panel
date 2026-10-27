@@ -9,6 +9,7 @@ import { parcelRouter } from './http/parcel-routes.js';
 import { LockerService } from './application/locker-service.js';
 import type { EventRepository } from './domain/event-repository.js';
 import { eventRouter } from './http/event-routes.js';
+import { carrierRouter } from './http/carrier-routes.js';
 
 export interface AppDependencies {
     compartments: CompartmentRepository;
@@ -40,6 +41,7 @@ export function createApp(deps: AppDependencies) {
     app.use(lockerRouter(deps.compartments));
     app.use(parcelRouter(deps.parcels, locker));
     app.use(eventRouter(deps.events));
+    app.use(carrierRouter(locker));
 
     app.use(errorHandler);
     
