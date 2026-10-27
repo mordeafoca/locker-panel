@@ -10,17 +10,22 @@ import { LockerService } from './application/locker-service.js';
 import type { EventRepository } from './domain/event-repository.js';
 import { eventRouter } from './http/event-routes.js';
 import { carrierRouter } from './http/carrier-routes.js';
+import { PublishingEventRepository } from './application/publishing-event-repository.js';
+import type { ChangeNotifier } from './domain/change-notifier.js';
+import { streamRouter } from './http/stream-routes.js';
 
 export interface AppDependencies {
     compartments: CompartmentRepository;
     parcels: ParcelRepository;
     events: EventRepository;
+    notifier: ChangeNotifier;
 }
 
 export function createApp(deps: AppDependencies) {
     const app= express();
-    const locker = new LockerService(deps.compartments, deps.parcels, deps.events);
-
+    const events = new PublishingEventRepository(deps.events, deps.notifier);
+    const locker = new LockerService(deps.compartments, deps.parcels, events);
+    
     app.use(
         pinoHttp({
             logger,
@@ -40,7 +45,8 @@ export function createApp(deps: AppDependencies) {
 
     app.use(lockerRouter(deps.compartments));
     app.use(parcelRouter(deps.parcels, locker));
-    app.use(eventRouter(deps.events));
+    app.use(eventRouter(events));
+    app.use(streamRouter(deps.notifier));
     app.use(carrierRouter(locker));
 
     app.use(errorHandler);

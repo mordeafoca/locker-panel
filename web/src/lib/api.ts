@@ -59,3 +59,11 @@ export async function listEvents(limit = 8): Promise<LockerEvent[]> {
 export function deliverFromCarrier(carrier: Carrier, payload: unknown): Promise<Parcel> {
   return request<Parcel>(`/carriers/${carrier}/parcels`, { method: 'POST', body: JSON.stringify(payload) });
 }
+
+export function subscribeToChanges(onChange: () => void, onConnectionChange: () => void): () => void {
+  const source = new EventSource('/api/stream');
+  source.addEventListener('change', onChange);
+  source.onopen = onConnectionChange;
+  source.onerror = onConnectionChange;
+  return () => source.close();
+}

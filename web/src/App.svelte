@@ -13,8 +13,6 @@
   import { theme, toggleTheme } from './lib/theme.svelte';
   import type { Carrier, Compartment, LockerEvent, NewParcel, Parcel, ParcelStatus } from './lib/types';
 
-  const REFRESH_MS = 4000;
-
   let compartments = $state<Compartment[]>([]);
   let parcels = $state<Parcel[]>([]);
   let events = $state<LockerEvent[]>([]);
@@ -147,12 +145,12 @@
     }
   }
 
+  // The API pushes a "change" whenever something happens, from any window or carrier.
+  // Opening or losing the connection also triggers a refresh, so nothing is missed
+  // while disconnected and the screen shows when the API is down.
   onMount(() => {
     refresh();
-    const timer = setInterval(() => {
-      if (document.visibilityState === 'visible' && !busy) refresh();
-    }, REFRESH_MS);
-    return () => clearInterval(timer);
+    return api.subscribeToChanges(refresh, refresh);
   });
 </script>
 
